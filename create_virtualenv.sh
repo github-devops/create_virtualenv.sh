@@ -2,7 +2,7 @@
 
 set -e
 
-BASE_DIR="$(pwd)"
+BASE_DIR="$(cd .. && pwd)"
 #------------------------------------- FUNCTIONS -------------------------------------------
 function error() {
     if [[ ${1} = '' ]];then
@@ -32,6 +32,11 @@ function install_pip() {
     virtualenv --python=python"${1}" "${BASE_DIR}/venv_dev"
 }
 
+function rm_venv_dev(){
+	files="$(ls -A ${BASE_DIR}/venv_dev/)"
+	echo "$files"
+}
+
 #------------------------------------- START -----------------------------------------------
 
 if [ -d "${BASE_DIR}/venv_dev" ];then
@@ -41,7 +46,7 @@ if [ -d "${BASE_DIR}/venv_dev" ];then
     fi
 fi
 
-rm -rf "${BASE_DIR}/venv_dev"
+find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\)" -delete
 
 if ! is_venv_dev_active;then
     if ! install_pip 3; then
