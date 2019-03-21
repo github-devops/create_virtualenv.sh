@@ -33,8 +33,7 @@ function install_pip() {
 }
 
 function rm_venv_dev(){
-	files="$(ls -A ${BASE_DIR}/venv_dev/)"
-	echo "$files"
+	find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\)" -delete
 }
 
 #------------------------------------- START -----------------------------------------------
@@ -46,7 +45,7 @@ if [ -d "${BASE_DIR}/venv_dev" ];then
     fi
 fi
 
-find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\)" -delete
+rm_venv_dev
 
 if ! is_venv_dev_active;then
     if ! install_pip 3; then
