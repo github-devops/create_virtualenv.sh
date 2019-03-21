@@ -2,7 +2,7 @@
 
 set -e
 
-BASE_DIR="$(cd .. && pwd)"
+BASE_DIR="$(pwd)"
 #------------------------------------- FUNCTIONS -------------------------------------------
 function error() {
     if [[ ${1} = '' ]];then
@@ -20,7 +20,7 @@ function is_answer_yes(){
 }
 
 function is_venv_dev_active() {
-    [ "$(which python)" == "${BASE_DIR}/venv_dev/bin/python" ] && return 0 || return 1
+    [ "$(which python)" == "${BASE_DIR}/bin/python" ] && return 0 || return 1
 }
 
 function install_pip() {
@@ -29,16 +29,16 @@ function install_pip() {
         exit 255
     fi
     PYTHON_VERSION="${1}"
-    virtualenv --python=python"${1}" "${BASE_DIR}/venv_dev"
+    virtualenv --python=python"${1}" "${BASE_DIR}/"
 }
 
 function rm_venv_dev(){
-	find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\)" -delete
+	find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
 }
 
 #------------------------------------- START -----------------------------------------------
 
-if [ -d "${BASE_DIR}/venv_dev" ];then
+if [ -d "${BASE_DIR}/bin" ];then
     echo "Virtualenv is exist"
     if ! is_answer_yes "Do you want override venv? [y/N] ";then
         echo "Good bye!" && exit 0
@@ -55,12 +55,13 @@ if ! is_venv_dev_active;then
     fi
 fi
 
-if ! source "${BASE_DIR}/venv_dev/bin/activate";then
+if ! source "${BASE_DIR}/bin/activate";then
     echo "Virtualenv: FAILED"
     exit 2
 fi
 
-if [ -f "${BASE_DIR}/requirements.txt" ];then
+if [[ ! $(cat "${BASE_DIR}/requirements.txt") == "" ]];then
+    echo "Install  from requirements.txt ..."
     pip install -r requirements.txt
 fi
 
