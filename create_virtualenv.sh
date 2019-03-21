@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 set -e
-
+#------------------------------------- VARIABLES -------------------------------------------
 BASE_DIR="$(pwd)"
+VENV_DIRS=(	bin	lib	include	share )
 #------------------------------------- FUNCTIONS -------------------------------------------
 function error() {
     if [[ ${1} = '' ]];then
@@ -33,7 +34,8 @@ function install_pip() {
 }
 
 function rm_venv_dev(){
-	find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
+	rm -rf "${VENV_DIRS[@]}"
+	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
 }
 
 #------------------------------------- START -----------------------------------------------
@@ -64,6 +66,8 @@ if [[ ! $(cat "${BASE_DIR}/requirements.txt") == "" ]];then
     echo "Install  from requirements.txt ..."
     pip install -r requirements.txt
 fi
+
+ln -s ${BASE_DIR}/bin/activate activate && chmod +x activate
 
 echo "---------------------"
 pip -V
