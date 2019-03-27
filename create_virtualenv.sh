@@ -3,7 +3,7 @@
 set -e
 #------------------------------------- VARIABLES -------------------------------------------
 BASE_DIR="$(pwd)"
-VENV_DIRS=(	bin	lib	include	share )
+VENV_DIRS=( bin lib include share )
 #------------------------------------- FUNCTIONS -------------------------------------------
 function error() {
     if [[ ${1} = '' ]];then
@@ -20,7 +20,7 @@ function is_answer_yes(){
     [[ "$answer" =~ ^[Yy]$ ]] && return 0 || return 1
 }
 
-function is_venv_dev_active() {
+function is_venv_active() {
     [ "$(which python)" == "${BASE_DIR}/bin/python" ] && return 0 || return 1
 }
 
@@ -33,9 +33,9 @@ function install_pip() {
     virtualenv --python=python"${1}" "${BASE_DIR}/"
 }
 
-function rm_venv_dev(){
+function rm_venv(){
 	rm -rf "${VENV_DIRS[@]}"
-	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
+	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\|remove_virtualenv.sh\)" -delete
 }
 
 #------------------------------------- START -----------------------------------------------
@@ -47,9 +47,9 @@ if [ -d "${BASE_DIR}/bin" ];then
     fi
 fi
 
-rm_venv_dev
+rm_venv
 
-if ! is_venv_dev_active;then
+if ! is_venv_active;then
     if ! install_pip 3; then
         error "virtualenv not installed"
         echo "use command: sudo apt-get install virtualenv"
