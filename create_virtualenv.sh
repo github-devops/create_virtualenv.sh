@@ -3,7 +3,7 @@
 set -e
 #------------------------------------- VARIABLES -------------------------------------------
 BASE_DIR="$(pwd)"
-VENV_DIRS=( bin lib include share )
+VENV_DIRS=(	bin	lib	include	share )
 #------------------------------------- FUNCTIONS -------------------------------------------
 function error() {
     if [[ ${1} = '' ]];then
@@ -35,19 +35,22 @@ function install_pip() {
 
 function rm_venv(){
 	rm -rf "${VENV_DIRS[@]}"
-	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\|remove_virtualenv.sh\)" -delete
+	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
 }
 
 #------------------------------------- START -----------------------------------------------
 
 if [ -d "${BASE_DIR}/bin" ];then
     echo "Virtualenv is exist"
-    if ! is_answer_yes "Do you want override venv? [y/N] ";then
+    if ! is_answer_yes "Do you want remove venv? [y/N] ";then
+        echo "Good bye!" && exit 0
+    fi
+    rm_venv
+    if ! is_answer_yes "Do you want to create venv? [y/N] ";then
         echo "Good bye!" && exit 0
     fi
 fi
 
-rm_venv
 
 if ! is_venv_active;then
     if ! install_pip 3; then
