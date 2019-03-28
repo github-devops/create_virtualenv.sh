@@ -5,4 +5,3 @@
 !.gitignore
 !create_virtualenv.sh
 !requirements.txt
-!remove_virtualenv.sh
