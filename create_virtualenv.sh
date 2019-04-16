@@ -31,6 +31,7 @@ function install_pip() {
     fi
     PYTHON_VERSION="${1}"
     virtualenv --python=python"${1}" "${BASE_DIR}/"
+    ln -s ./bin/activate activate
 }
 
 function rm_venv(){
