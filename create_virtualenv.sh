@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 
 set -e
+
 #------------------------------------- VARIABLES -------------------------------------------
+
 BASE_DIR="$(pwd)"
-VENV_DIRS=(	bin	lib	include	share )
+VENV_DIRS=(	bin	lib	include	share local )
+FILE_REQUIREMENTS="${BASE_DIR}/requirements.txt"
+
 #------------------------------------- FUNCTIONS -------------------------------------------
+
 function error() {
-    if [[ ${1} = '' ]];then
+    if [[ ! ${1} ]];then
         echo "ERROR: need argument"
         exit 1
     fi
@@ -17,7 +22,7 @@ function is_answer_yes(){
     local message="${1}"
     echo -n "${message}"
     read answer
-    [[ "$answer" =~ ^[Yy]$ ]] && return 0 || return 1
+    [[ "${answer}" =~ ^[Yy]$ ]] && return 0 || return 1
 }
 
 function is_venv_active() {
@@ -25,16 +30,14 @@ function is_venv_active() {
 }
 
 function install_pip() {
-    if [[ -z "${1}" ]];then
+    if [[ ! "${1}" ]];then
         echo "specify version of python in the venv"
         exit 255
     fi
-    PYTHON_VERSION="${1}"
     virtualenv --python=python"${1}" "${BASE_DIR}/"
-    ln -s ./bin/activate activate
 }
 
-function rm_venv(){
+function remove_virtualenv(){
 	rm -rf "${VENV_DIRS[@]}"
 	sudo find . ! -regex ".*/\(create_virtualenv.sh\|.git.*\|requirements.txt\)" -delete
 }
@@ -43,32 +46,31 @@ function rm_venv(){
 
 if [ -d "${BASE_DIR}/bin" ];then
     echo "Virtualenv is exist"
-    if ! is_answer_yes "Do you want remove venv? [y/N] ";then
+    if ! is_answer_yes "Do you want to remove venv? [y/N] ";then
         echo "Good bye!" && exit 0
     fi
-    rm_venv
+    remove_virtualenv
     if ! is_answer_yes "Do you want to create venv? [y/N] ";then
         echo "Good bye!" && exit 0
     fi
 fi
 
-
 if ! is_venv_active;then
     if ! install_pip 3; then
         error "virtualenv not installed"
-        echo "use command: sudo apt-get install virtualenv"
+        echo "use command: sudo apt-get update -y && sudo apt-get install virtualenv -y"
         exit 1
     fi
 fi
 
-if ! source "${BASE_DIR}/bin/activate";then
+if ! source "${BASE_DIR}/bin/activate" ;then
     echo "Virtualenv: FAILED"
-    exit 2
+    echo 'ERROR: line 68' && exit 1
 fi
 
-if [[ ! $(cat "${BASE_DIR}/requirements.txt") == "" ]];then
+if [[ -f  "${FILE_REQUIREMENTS}" && ! $(cat "${FILE_REQUIREMENTS}") ]];then
     echo "Install  from requirements.txt ..."
-    pip install -r requirements.txt
+    pip install -r "${FILE_REQUIREMENTS}"
 fi
 
 ln -s ${BASE_DIR}/bin/activate activate && chmod +x activate
@@ -79,6 +81,7 @@ pip list
 echo "---------------------"
 python -V
 echo "---------------------"
+echo "run command: \"source activate\" for use virtual enviroment"
+echo "---------------------"
 
-exit "${?}"
 #------------------------------------- END -----------------------------------------------
