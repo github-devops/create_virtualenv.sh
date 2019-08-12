@@ -19,6 +19,7 @@ function error() {
 }
 
 function is_answer_yes(){
+
     local message="${1}"
     echo -n "${message}"
     read answer
@@ -68,7 +69,7 @@ if ! source "${BASE_DIR}/bin/activate" ;then
     echo 'ERROR: line 68' && exit 1
 fi
 
-if [[ -f  "${FILE_REQUIREMENTS}" && ! $(cat "${FILE_REQUIREMENTS}") ]];then
+if [[ "$(cat ${FILE_REQUIREMENTS})" != "" ]];then
     echo "Install  from requirements.txt ..."
     pip install -r "${FILE_REQUIREMENTS}"
 fi
